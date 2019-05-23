@@ -1,8 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 
 from celery.backends.base import BaseDictBackend
-from base64 import b64decode as base64decode
-from base64 import b64encode as base64encode
+from base64 import b64decode, b64encode
+from kombu.serialization import dumps
 
 from ..models import TaskResult
 
@@ -48,6 +48,9 @@ class DatabaseBackend(BaseDictBackend):
         res.update(meta,
                    result=self.decode_content(obj, res.get('result')))
         return self.meta_from_decoded(res)
+
+    def _encode(self, data):
+        return dumps(data, serializer=self.serializer)
 
     def encode_content(self, data):
         content_type, content_encoding, content = self._encode(data)
